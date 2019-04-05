@@ -56,9 +56,10 @@ endExpNow = False  # flag for 'escape' or other condition => quit the exp
 
 # set connection to the serial port
 import serial
-exp.serial_port = serial.Serial('COM6', baudrate=230400, bytesize=serial.EIGHTBITS)
-# I think we need COM6 here, but I'm not sure
-# Except for the baud rate I can't find any of the settings in the Nexus user manual, so we have to poke in the dark a little bit
+exp.serial_port = serial.Serial('COM3', baudrate=230400, bytesize=serial.EIGHTBITS)
+# I think we can either use COM6 or COM3 here. When I use COM6 there is an error, so it's either COM3 or we need to connect something to the USB port of COM6 to make it work.
+# Except for the baud rate I can't find any of the settings in the Nexus user manual, so we have to poke in the dark a little bit.
+# I get error messages with the current settings.
 
 
 # Setup the Window

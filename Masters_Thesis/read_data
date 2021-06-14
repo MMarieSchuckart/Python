@@ -1,0 +1,139 @@
+# -*- coding: utf-8 -*-
+"""
+
+Analysis for EEG & grip strength sensor (gss) data
+
+Part of Merle's Master Thesis
+Version 1: 26.5.2021
+
+---------------------------------------------------
+
+1. import packages
+
+1.1 import data
+1.2 inspect data
+
+2. epoch EEG & gss data
+
+3. Preproc: 
+    3.1 bandpass filtering (which lowpass & highpass cutoffs? which filter order & type?)
+    3.2 reject noisy trials (--> criteria??? esp. for sensor data???) 
+
+4. Fourier analysis
+
+5. compute coherences based on Fourier coefficient 
+(motor-auditory & motor-visual ROI (regions of interest))
+
+6. Plots?
+
+
+"""
+
+# -----------------------------------------------------------
+
+""" 1. packages & variables """
+
+# 1.1 import packages
+import os
+
+# Python MNE for eeg data analysis / processing
+#import mne
+
+# for ICA for preproc: 
+#from mne.preprocessing import ICA, create_ecg_epochs, create_eog_epochs
+
+
+
+""" set path to dataframes and load data """
+
+
+
+# I spent quite some time figuring this out: 
+# You need to pip install pyxdf before being able to import it. 
+# You can do this by copying the following line into your terminal:
+
+# latest stable version (does not work for me)
+# pip install pyxdf
+
+# latest developer version
+# pip install git+https://github.com/xdf-modules/pyxdf.git
+
+# I found this here: https://github.com/xdf-modules/pyxdf
+
+# (The internet says you should install PyPDF2 
+# to be able to import pyxdf, but that doesn't work)
+
+# Now import package for reading in xdf data:
+import pyxdf
+
+
+# for plots
+import matplotlib.pyplot as plt
+
+# for random numbers
+import numpy as np
+
+# for getting all files in a directory
+import glob
+
+
+
+""" set working directory & get file list """
+
+# working directory
+os.chdir("/Users/merle/Desktop/Master_Testdaten/")
+
+# get list of all xdf files in my directory 
+# (the asterix in the path means the name of the 
+# file can be anything as long as it has an .xdf ending)
+file_list = glob.glob("/Users/merle/Desktop/Master_Testdaten/*.xdf")
+
+# set number of subjects as number of xdf files in directory
+subj_n = len(file_list)
+
+
+
+
+# loop xdf files aka participants:
+for file_name in file_list:
+
+    # load xdf file of chosen participant:
+    data, header = pyxdf.load_xdf(file_name)
+
+    # the first stream (at position 0 because python is weird) 
+    # is empty, so we start at the second stream at pos 1 and 
+    # have a look at every stream in data (in our case always 2?):
+    # stream 1 in "time_series": time series data from EEG?!
+    # stream 2 in "time_series": key presses?    
+        
+        
+    for stream_number in range(1,len(data),1):
+    
+        stream = data[stream_number]
+
+        y = stream['time_series']
+
+        # if there are several values in y (if it's a list), draw markers 
+        """ there's something weird happening here. Look at the markers!"""
+        
+        if isinstance(y, list):
+            # list of strings, draw one vertical line for each marker by getting the time stamps
+            for timestamp, marker in zip(stream['time_stamps'], y):
+                plot_osc = plt.axvline(x = timestamp)
+                print(f'Marker "{marker[0]}" @ {timestamp:.2f}s')
+        elif isinstance(y, np.ndarray):
+            # numeric data, draw as horizontal lines
+            plot_markers = plt.plot(stream['time_stamps'], y)
+        else:
+            raise RuntimeError("Sorry, this doesn't work, honey! This stream's format is not a list!")
+        plt.show()
+
+
+
+
+        
+# END LOOP PARTICIPANTS 
+
+# check data structure:
+# data[stream_number]
+

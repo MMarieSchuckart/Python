@@ -1,0 +1,48 @@
+""" How to connect a Python script (e.g. a PsychoPy study) to LSL & send LSL-triggers """
+
+# You need to pip install pylsl first to make this work.
+
+# Copy & paste the following string into your terminal: pip install pylsl
+
+# This only works if pip is installed on your device. You can check this 
+# by running the following line in your terminal: py -m pip --version
+# This should give you the version of the installed pip package.
+
+# If this doesn't work, follow these instructions and hope 
+# for the best (pip is ironically difficult to install)
+# https://pip.pypa.io/en/stable/installation/
+
+#------------------------------------------------------------------------
+
+# 1. first some packages:
+from time import sleep
+# import packages for LSL connection
+from pylsl import StreamInfo, StreamOutlet 
+
+
+# 2. save stream info
+info = StreamInfo(name='PsychoPy_Triggers', type='Markers', channel_count=1, nominal_srate = 'IRREGULAR_RATE',
+                  channel_format='int32', source_id='')
+# source_id should be a unique identifier of the
+# device / source of the data, if available (e.g. serial number)
+# Default is ''
+
+# nominal_srate is the sampling rate - change this if you
+# send values with a certain sampling rate
+
+
+# 3. Initialize the stream
+outlet = StreamOutlet(info)
+
+# 4. Send 200 triggers with 1s between them to the LSL
+# You can see & record the stream in the LabRecorder App.
+
+for i in range(200):
+    print(i) # check in your console if it works
+    # send triggers to LSL (you can use different values, doesn't have to be 255)
+    outlet.push_sample(x=[255]) 
+    sleep(1) # 1 second pause between triggers
+
+# So if you have a PsychoPy study and you want to send a trigger, 
+# just initialize the stream info & the outlet, and then push the triggers 
+# everytime something relevant is happening in your study! Super easy! :-)
